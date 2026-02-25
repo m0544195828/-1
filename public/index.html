@@ -238,7 +238,7 @@
 
 <script>
   // ⬇️ שנה לכתובת שלך מ-Render אחרי ה-deploy
-  const SERVER = 'https://1-h69j.onrender.com';
+  const SERVER = window.location.origin;
 
   let mode = 'web';
   let hist = [], fwds = [], curYt = '';
@@ -324,6 +324,13 @@
   }
 
   document.getElementById('ubar').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+
+  // קליטת ניווט מתוך ה-iframe (כאשר לוחצים על קישור בדף)
+  window.addEventListener('message', e => {
+    if (e.data && e.data.type === 'navigate') {
+      go(e.data.url);
+    }
+  });
 </script>
 </body>
 </html>
