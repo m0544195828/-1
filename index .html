@@ -238,7 +238,7 @@
 
 <script>
   // ⬇️ שנה לכתובת שלך מ-Render אחרי ה-deploy
-  const SERVER = 'https://1-h69j.onrender.com';
+  const SERVER = window.location.origin;
 
   let mode = 'web';
   let hist = [], fwds = [], curYt = '';
@@ -277,7 +277,7 @@
   function loadWeb(url) {
     status('טוען...', 'loading');
     const f = document.getElementById('pframe');
-    f.src = `${SERVER}/proxy?url=${encodeURIComponent(url)}`;
+    f.src = `${SERVER}/p?u=${encodeURIComponent(url)}`;
     f.onload = () => { f.classList.add('show'); document.getElementById('empty').style.display = 'none'; status('✓ נטען', 'ok'); document.getElementById('gobtn').disabled = false; };
     f.onerror = () => { status('שגיאה', 'error'); document.getElementById('gobtn').disabled = false; };
   }
@@ -324,6 +324,13 @@
   }
 
   document.getElementById('ubar').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+
+  // קליטת ניווט מתוך ה-iframe (כאשר לוחצים על קישור בדף)
+  window.addEventListener('message', e => {
+    if (e.data && e.data.type === 'navigate') {
+      go(e.data.url);
+    }
+  });
 </script>
 </body>
 </html>
