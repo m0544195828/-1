@@ -1,5 +1,5 @@
 {
-  "name": "proxy-server",
+  "name": "screenshot-browser",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -7,6 +7,8 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "puppeteer-core": "^21.0.0",
+    "@sparticuz/chromium": "^123.0.0"
   }
 }
