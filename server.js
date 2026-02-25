@@ -231,4 +231,59 @@ app.post('/back', async (req, res) => {
   }
 });
 
+// ── /video-info?url=... — חילוץ מידע על וידאו מכל אתר ──────────────────────
+app.get('/video-info', (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).json({ error: 'Missing url' });
+
+  exec(`yt-dlp --dump-json --no-playlist "${url}"`,
+    { maxBuffer: 10 * 1024 * 1024, timeout: 30000 },
+    (err, stdout) => {
+      if (err) return res.status(500).json({ error: 'לא נמצא וידאו בדף הזה' });
+      try {
+        const info = JSON.parse(stdout);
+        const formats = (info.formats || [])
+          .filter(f => f.url && (f.vcodec !== 'none' || f.acodec !== 'none'))
+          .map(f => ({
+            id: f.format_id,
+            label: f.height ? `${f.height}p` : (f.abr ? `${f.abr}kbps audio` : f.format_note || f.format_id),
+            height: f.height || 0,
+            url: f.url,
+            hasVideo: f.vcodec !== 'none',
+            hasAudio: f.acodec !== 'none',
+          }))
+          .filter(f => f.hasVideo)
+          .sort((a, b) => b.height - a.height);
+
+        res.json({
+          title: info.title,
+          thumbnail: info.thumbnail,
+          duration: info.duration,
+          site: info.extractor_key,
+          formats: formats.length ? formats : [],
+          directUrl: formats[0]?.url || null,
+        });
+      } catch { res.status(500).json({ error: 'שגיאת פענוח' }); }
+    }
+  );
+});
+
+// ── /video-stream?url=... — סטרימינג וידאו מכל אתר ─────────────────────────
+app.get('/video-stream', (req, res) => {
+  const url = req.query.url;
+  const fmt = req.query.format || 'best[ext=mp4]/best';
+  if (!url) return res.status(400).send('Missing url');
+
+  res.setHeader('Content-Type', 'video/mp4');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  const proc = exec(
+    `yt-dlp -f "${fmt}" -o - "${url}"`,
+    { maxBuffer: 500 * 1024 * 1024 }
+  );
+  proc.stdout.pipe(res);
+  proc.stderr.on('data', d => process.stderr.write(d));
+  req.on('close', () => proc.kill('SIGTERM'));
+});
+
 app.listen(PORT, () => console.log(`✅ Screenshot Browser on http://localhost:${PORT}`));
