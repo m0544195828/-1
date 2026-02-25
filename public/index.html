@@ -277,7 +277,7 @@
   function loadWeb(url) {
     status('טוען...', 'loading');
     const f = document.getElementById('pframe');
-    f.src = `${SERVER}/proxy?url=${encodeURIComponent(url)}`;
+    f.src = `${SERVER}/p?u=${encodeURIComponent(url)}`;
     f.onload = () => { f.classList.add('show'); document.getElementById('empty').style.display = 'none'; status('✓ נטען', 'ok'); document.getElementById('gobtn').disabled = false; };
     f.onerror = () => { status('שגיאה', 'error'); document.getElementById('gobtn').disabled = false; };
   }
