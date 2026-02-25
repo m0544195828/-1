@@ -3,202 +3,168 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Screenshot Browser</title>
+  <title>Proxy Browser</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;600;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #07070e;
-      --surface: #10101a;
-      --card: #13131f;
-      --border: #1c1c2e;
-      --accent: #6c63ff;
-      --accent2: #a78bfa;
-      --green: #52b788;
-      --red: #ff4d4d;
-      --text: #eaeaf4;
-      --muted: #4a4a6a;
+      --bg: #07070e; --surface: #10101a; --card: #13131f; --border: #1c1c2e;
+      --accent: #6c63ff; --accent2: #a78bfa; --green: #52b788; --red: #ff4d4d;
+      --text: #eaeaf4; --muted: #4a4a6a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Rubik', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 24px 12px 40px;
-    }
+    body { font-family: 'Rubik', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 12px 40px; }
     .wrap { width: 100%; max-width: 1300px; }
-
     header { text-align: center; margin-bottom: 18px; }
-    h1 {
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-      font-weight: 800;
-      letter-spacing: -2px;
-      background: linear-gradient(135deg, #fff, var(--accent2), var(--accent));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      margin-bottom: 4px;
-    }
+    h1 { font-size: clamp(1.6rem,3.5vw,2.2rem); font-weight: 800; letter-spacing: -2px; background: linear-gradient(135deg,#fff,var(--accent2),var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
     .sub { color: var(--muted); font-size: 0.82rem; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 5px; margin-bottom: 14px; }
+    .tab { flex: 1; padding: 9px; border: none; border-radius: 7px; font-family: 'Rubik', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: transparent; color: var(--muted); transition: all 0.2s; }
+    .tab.on { background: linear-gradient(135deg,var(--accent),#4f46e5); color: #fff; box-shadow: 0 3px 10px rgba(108,99,255,0.3); }
+
+    /* Video section */
+    .video-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 14px; }
+    .vsec-head { padding: 16px; background: var(--card); border-bottom: 1px solid var(--border); }
+    .vsec-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+    .vsec-row { display: flex; gap: 8px; }
+    .vinput { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 8px 12px; font-family: 'Rubik', sans-serif; font-size: 0.84rem; color: var(--text); outline: none; direction: ltr; }
+    .vinput:focus { border-color: rgba(108,99,255,0.5); }
+    .vinput::placeholder { color: var(--muted); }
+    .vbtn { background: linear-gradient(135deg,var(--accent),#4f46e5); color: #fff; border: none; border-radius: 7px; padding: 8px 18px; font-family: 'Rubik', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+    .vbtn:hover { opacity: 0.85; }
+    .vbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .vstatus { display: none; padding: 8px 14px; font-size: 0.8rem; align-items: center; gap: 7px; }
+    .vstatus.show { display: flex; }
+    .vstatus.loading { color: var(--accent2); background: rgba(167,139,250,0.05); }
+    .vstatus.error { color: var(--red); background: rgba(255,77,77,0.05); }
+    .vstatus.ok { color: var(--green); background: rgba(82,183,136,0.05); }
+
+    .vinfo { display: none; padding: 14px; background: var(--card); border-bottom: 1px solid var(--border); }
+    .vinfo.show { display: block; }
+    .vinfo-top { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    .vthumb { width: 96px; height: 54px; object-fit: cover; border-radius: 7px; background: #000; flex-shrink: 0; }
+    .vtitle { font-size: 0.87rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 3px; }
+    .vsite { font-size: 0.74rem; color: var(--muted); }
+    .vcontrols { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .vselect { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-family: 'Rubik', sans-serif; font-size: 0.78rem; color: var(--text); outline: none; }
+    .playbtn { background: linear-gradient(135deg,var(--green),#2d6a4f); color: #fff; border: none; border-radius: 6px; padding: 6px 16px; font-family: 'Rubik', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    .playbtn:hover { opacity: 0.85; }
+
+    .vplayer-wrap { display: none; position: relative; padding-top: 56.25%; background: #000; }
+    .vplayer-wrap.show { display: block; }
+    .vplayer-wrap video { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    .vsupport { padding: 9px 14px; background: var(--card); border-top: 1px solid var(--border); font-size: 0.71rem; color: var(--muted); }
 
     /* Browser chrome */
     .browser { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-
-    .toolbar {
-      display: flex; align-items: center; gap: 7px;
-      padding: 9px 12px; background: var(--card); border-bottom: 1px solid var(--border);
-    }
+    .toolbar { display: flex; align-items: center; gap: 7px; padding: 9px 12px; background: var(--card); border-bottom: 1px solid var(--border); }
     .dots { display: flex; gap: 5px; flex-shrink: 0; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .dr{background:#ff5f57;} .dy{background:#febc2e;} .dg{background:#28c840;}
-
     .navs { display: flex; gap: 3px; }
-    .nbtn {
-      width: 26px; height: 26px; background: transparent;
-      border: 1px solid var(--border); border-radius: 6px;
-      color: var(--muted); cursor: pointer; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
-    }
+    .nbtn { width: 26px; height: 26px; background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
     .nbtn:hover { border-color: var(--accent2); color: var(--accent2); }
     .nbtn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    .ubar {
-      flex: 1; background: var(--bg); border: 1px solid var(--border);
-      border-radius: 7px; padding: 6px 11px;
-      font-family: monospace; font-size: 0.82rem; color: var(--text);
-      outline: none; direction: ltr; transition: border-color 0.2s;
-    }
+    .ubar { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 6px 11px; font-family: monospace; font-size: 0.82rem; color: var(--text); outline: none; direction: ltr; transition: border-color 0.2s; }
     .ubar:focus { border-color: rgba(108,99,255,0.5); }
     .ubar::placeholder { font-family: 'Rubik', sans-serif; color: var(--muted); }
-
-    .gobtn {
-      background: linear-gradient(135deg, var(--accent), #4f46e5);
-      color: #fff; border: none; border-radius: 7px;
-      padding: 6px 16px; font-family: 'Rubik', sans-serif;
-      font-size: 0.84rem; font-weight: 700; cursor: pointer;
-      box-shadow: 0 3px 10px rgba(108,99,255,0.3); transition: opacity 0.2s; flex-shrink: 0;
-    }
+    .gobtn { background: linear-gradient(135deg,var(--accent),#4f46e5); color: #fff; border: none; border-radius: 7px; padding: 6px 16px; font-family: 'Rubik', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; box-shadow: 0 3px 10px rgba(108,99,255,0.3); transition: opacity 0.2s; flex-shrink: 0; }
     .gobtn:hover { opacity: 0.85; }
     .gobtn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* Status */
-    .sb {
-      display: none; align-items: center; gap: 7px;
-      padding: 6px 12px; font-size: 0.79rem; border-bottom: 1px solid var(--border);
-    }
+    .sb { display: none; align-items: center; gap: 7px; padding: 6px 12px; font-size: 0.79rem; border-bottom: 1px solid var(--border); }
     .sb.show { display: flex; }
     .sb.loading { color: var(--accent2); background: rgba(167,139,250,0.05); }
-    .sb.error   { color: var(--red);     background: rgba(255,77,77,0.05); }
-    .sb.ok      { color: var(--green);   background: rgba(82,183,136,0.05); }
-    .spin {
-      width: 11px; height: 11px; border: 2px solid currentColor;
-      border-top-color: transparent; border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    .sb.error { color: var(--red); background: rgba(255,77,77,0.05); }
+    .sb.ok { color: var(--green); background: rgba(82,183,136,0.05); }
+    .spin { width: 11px; height: 11px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Screen area */
-    .screen-wrap {
-      position: relative;
-      background: #111;
-      min-height: 500px;
-      cursor: crosshair;
-      overflow: hidden;
-    }
-
-    .empty-state {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 500px;
-      gap: 10px; color: var(--muted); background: var(--surface);
-    }
+    .screen-wrap { position: relative; background: #111; min-height: 500px; cursor: crosshair; overflow: hidden; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 500px; gap: 10px; color: var(--muted); background: var(--surface); }
     .eicon { font-size: 3rem; opacity: 0.15; }
-
-    #screen {
-      display: none;
-      width: 100%;
-      height: auto;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
+    #screen { display: none; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
     #screen.show { display: block; }
-
-    /* Click overlay */
-    #overlay {
-      position: absolute;
-      inset: 0;
-      cursor: crosshair;
-    }
-
-    .click-ring {
-      position: absolute;
-      width: 30px; height: 30px;
-      border: 2px solid var(--accent2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      animation: ring 0.4s ease-out forwards;
-    }
-    @keyframes ring {
-      from { opacity: 1; transform: translate(-50%,-50%) scale(0.3); }
-      to   { opacity: 0; transform: translate(-50%,-50%) scale(1.5); }
-    }
-
-    /* Type bar */
-    .typebar {
-      display: none;
-      align-items: center; gap: 7px;
-      padding: 8px 12px; background: var(--card); border-top: 1px solid var(--border);
-    }
+    #overlay { position: absolute; inset: 0; cursor: crosshair; }
+    .click-ring { position: absolute; width: 30px; height: 30px; border: 2px solid var(--accent2); border-radius: 50%; transform: translate(-50%,-50%); pointer-events: none; animation: ring 0.4s ease-out forwards; }
+    @keyframes ring { from { opacity:1; transform:translate(-50%,-50%) scale(0.3); } to { opacity:0; transform:translate(-50%,-50%) scale(1.5); } }
+    .typebar { display: none; align-items: center; gap: 7px; padding: 8px 12px; background: var(--card); border-top: 1px solid var(--border); }
     .typebar.show { display: flex; }
-    .typeinput {
-      flex: 1; background: var(--bg); border: 1px solid var(--border);
-      border-radius: 7px; padding: 6px 11px;
-      font-family: 'Rubik', sans-serif; font-size: 0.84rem; color: var(--text); outline: none;
-    }
+    .typeinput { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 6px 11px; font-family: 'Rubik', sans-serif; font-size: 0.84rem; color: var(--text); outline: none; }
     .typeinput:focus { border-color: rgba(108,99,255,0.4); }
-    .sendbtn {
-      background: linear-gradient(135deg, var(--green), #2d6a4f);
-      color: #fff; border: none; border-radius: 7px;
-      padding: 6px 14px; font-family: 'Rubik', sans-serif;
-      font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-    }
-    .sendbtn:hover { opacity: 0.85; }
-
-    /* Quick links */
-    .qbar {
-      display: flex; gap: 5px; flex-wrap: wrap;
-      padding: 9px 12px; background: var(--card); border-top: 1px solid var(--border);
-    }
+    .sendbtn { background: linear-gradient(135deg,var(--green),#2d6a4f); color: #fff; border: none; border-radius: 7px; padding: 6px 14px; font-family: 'Rubik', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    .qbar { display: flex; gap: 5px; flex-wrap: wrap; padding: 9px 12px; background: var(--card); border-top: 1px solid var(--border); }
     .qlbl { font-size: 0.71rem; color: var(--muted); align-self: center; }
-    .ql {
-      background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-      padding: 4px 10px; font-size: 0.74rem; color: var(--muted);
-      cursor: pointer; transition: all 0.15s; font-family: 'Rubik', sans-serif;
-    }
+    .ql { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.74rem; color: var(--muted); cursor: pointer; transition: all 0.15s; font-family: 'Rubik', sans-serif; }
     .ql:hover { border-color: var(--accent2); color: var(--accent2); }
-
-    /* Hint */
     .hint { font-size: 0.72rem; color: var(--muted); text-align: center; padding: 8px; }
   </style>
 </head>
 <body>
 <div class="wrap">
+
   <header>
-    <h1>🖥️ Screenshot Browser</h1>
-    <p class="sub">דפדפן אמיתי רץ על השרת — אתה רואה תמונה ויכול ללחוץ</p>
+    <h1>Proxy Browser</h1>
+    <p class="sub">גלישה + וידאו מכל אתר — הכל דרך השרת שלך</p>
   </header>
 
+  <!-- Mode tabs -->
+  <div class="tabs">
+    <button class="tab on" id="tabBrowse" onclick="setTab('browse')">&#128251; גלישה</button>
+    <button class="tab" id="tabVideo" onclick="setTab('video')">&#9654; וידאו</button>
+  </div>
+
+  <!-- ── Video tab ── -->
+  <div class="video-section" id="videoSection" style="display:none;">
+    <div class="vsec-head">
+      <div class="vsec-label">הדבק קישור לדף עם וידאו</div>
+      <div class="vsec-row">
+        <input class="vinput" id="videoUrl" type="text" placeholder="https://facebook.com/... TikTok, Instagram, Vimeo, Ynet..." />
+        <button class="vbtn" id="vExtractBtn" onclick="loadVideo()">חלץ וידאו</button>
+      </div>
+    </div>
+
+    <div class="vstatus" id="vstatus">
+      <div class="spin"></div>
+      <span id="vstatusText"></span>
+    </div>
+
+    <div class="vinfo" id="vinfo">
+      <div class="vinfo-top">
+        <img class="vthumb" id="vthumb" src="" alt="" />
+        <div style="flex:1;min-width:0;">
+          <div class="vtitle" id="vtitle"></div>
+          <div class="vsite" id="vsite"></div>
+        </div>
+      </div>
+      <div class="vcontrols">
+        <select class="vselect" id="vfmt"></select>
+        <button class="playbtn" onclick="playVideo()">&#9654; נגן</button>
+      </div>
+    </div>
+
+    <div class="vplayer-wrap" id="vplayerWrap">
+      <video id="vid" controls autoplay></video>
+    </div>
+
+    <div class="vsupport">
+      תומך ב: Facebook &middot; Instagram &middot; TikTok &middot; Twitter/X &middot; Vimeo &middot; Dailymotion &middot; Ynet &middot; Walla &middot; ועוד 1000+ אתרים
+    </div>
+  </div>
+
+  <!-- ── Browse tab ── -->
+  <div id="browseSection">
   <div class="browser">
     <div class="toolbar">
       <div class="dots">
         <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
       </div>
       <div class="navs">
-        <button class="nbtn" id="bb" onclick="goBack()" title="אחורה">‹</button>
-        <button class="nbtn" onclick="reload()" title="רענון">↺</button>
-        <button class="nbtn" onclick="scrollPage('up')" title="גלול למעלה">↑</button>
-        <button class="nbtn" onclick="scrollPage('down')" title="גלול למטה">↓</button>
+        <button class="nbtn" onclick="goBack()" title="אחורה">&#8249;</button>
+        <button class="nbtn" onclick="reload()" title="רענון">&#8635;</button>
+        <button class="nbtn" onclick="scrollPage('up')" title="למעלה">&#8593;</button>
+        <button class="nbtn" onclick="scrollPage('down')" title="למטה">&#8595;</button>
       </div>
       <input class="ubar" id="ubar" type="text" placeholder="https://example.com" />
       <button class="gobtn" id="gobtn" onclick="loadUrl()">עבור</button>
@@ -211,18 +177,18 @@
 
     <div class="screen-wrap" id="screenWrap">
       <div class="empty-state" id="empty">
-        <div class="eicon">🖥️</div>
+        <div class="eicon">&#128251;</div>
         <div>הכנס כתובת אתר ולחץ עבור</div>
-        <div style="font-size:0.75rem;opacity:0.5">דפדפן Chromium רץ על השרת</div>
+        <div style="font-size:0.75rem;opacity:0.5;">Chromium רץ על השרת</div>
       </div>
       <img id="screen" alt="screenshot" draggable="false" />
       <div id="overlay" onclick="handleClick(event)"></div>
     </div>
 
     <div class="typebar" id="typebar">
-      <span style="font-size:0.8rem;color:var(--muted);flex-shrink:0">⌨️ הקלד:</span>
+      <span style="font-size:0.8rem;color:var(--muted);flex-shrink:0;">&#9000; הקלד:</span>
       <input class="typeinput" id="typeinput" type="text" placeholder="כתוב כאן..." />
-      <button class="sendbtn" onclick="sendType()">שלח ↵</button>
+      <button class="sendbtn" onclick="sendType()">שלח</button>
     </div>
 
     <div class="qbar">
@@ -234,19 +200,73 @@
       <button class="ql" onclick="nav('https://ynet.co.il')">Ynet</button>
     </div>
 
-    <div class="hint">לחץ על כל מקום בדף לאינטראקציה • גרור ← לגלילה</div>
+    <div class="hint">לחץ על כל מקום בדף לאינטראקציה</div>
   </div>
+  </div>
+
 </div>
 
 <script>
-  // ⬇️ כתובת השרת שלך ב-Render
   const SERVER = 'https://1-h69j.onrender.com';
 
-  let currentUrl = '';
-  let imgNaturalW = 1280;
-  let busy = false;
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  function setTab(t) {
+    document.getElementById('tabBrowse').classList.toggle('on', t === 'browse');
+    document.getElementById('tabVideo').classList.toggle('on', t === 'video');
+    document.getElementById('browseSection').style.display = t === 'browse' ? 'block' : 'none';
+    document.getElementById('videoSection').style.display  = t === 'video'  ? 'block' : 'none';
+  }
 
-  // ── Navigate ────────────────────────────────────────────────────────────
+  // ── Video ─────────────────────────────────────────────────────────────────
+  async function loadVideo() {
+    const url = document.getElementById('videoUrl').value.trim();
+    if (!url) return;
+    vStatus('מחפש וידאו...', 'loading');
+    document.getElementById('vExtractBtn').disabled = true;
+    document.getElementById('vinfo').classList.remove('show');
+    document.getElementById('vplayerWrap').classList.remove('show');
+
+    try {
+      const r = await fetch(`${SERVER}/video-info?url=${encodeURIComponent(url)}`);
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+
+      document.getElementById('vthumb').src = d.thumbnail || '';
+      document.getElementById('vtitle').textContent = d.title || '';
+      document.getElementById('vsite').textContent = d.site ? 'מקור: ' + d.site : '';
+
+      const sel = document.getElementById('vfmt');
+      sel.innerHTML = d.formats.map(f => `<option value="${f.id}">${f.label}</option>`).join('');
+
+      document.getElementById('vinfo').classList.add('show');
+      vStatus('נמצא! בחר איכות ולחץ נגן', 'ok');
+    } catch(e) {
+      vStatus('שגיאה: ' + e.message, 'error');
+    } finally {
+      document.getElementById('vExtractBtn').disabled = false;
+    }
+  }
+
+  function playVideo() {
+    const url = document.getElementById('videoUrl').value.trim();
+    const fmt = document.getElementById('vfmt').value;
+    document.getElementById('vid').src = `${SERVER}/video-stream?url=${encodeURIComponent(url)}&format=${encodeURIComponent(fmt)}`;
+    document.getElementById('vplayerWrap').classList.add('show');
+    vStatus('מנגן...', 'ok');
+  }
+
+  function vStatus(msg, type) {
+    const el = document.getElementById('vstatus');
+    document.getElementById('vstatusText').textContent = msg;
+    el.className = 'vstatus show ' + type;
+    if (type !== 'loading') setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  document.getElementById('videoUrl').addEventListener('keydown', e => { if (e.key === 'Enter') loadVideo(); });
+
+  // ── Browse (screenshot) ───────────────────────────────────────────────────
+  let currentUrl = '', imgNaturalW = 1280, busy = false;
+
   async function loadUrl() {
     let url = document.getElementById('ubar').value.trim();
     if (!url) return;
@@ -261,152 +281,105 @@
 
   async function goBack() {
     if (busy) return;
-    setStatus('חוזר אחורה...', 'loading');
+    setStatus('חוזר...', 'loading');
     busy = true;
     try {
-      const r = await fetch(`${SERVER}/back`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      const r = await fetch(`${SERVER}/back`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       showScreen(d);
-    } catch (e) { setStatus('שגיאה: ' + e.message, 'error'); }
+    } catch(e) { setStatus('שגיאה: ' + e.message, 'error'); }
     finally { busy = false; }
   }
 
-  async function reload() {
-    if (currentUrl) await fetchScreenshot(currentUrl);
-  }
+  async function reload() { if (currentUrl) await fetchScreenshot(currentUrl); }
 
-  // ── Fetch screenshot ─────────────────────────────────────────────────────
   async function fetchScreenshot(url) {
     if (busy) return;
     busy = true;
     setStatus('טוען דפדפן...', 'loading');
     document.getElementById('gobtn').disabled = true;
-
     try {
       const r = await fetch(`${SERVER}/screenshot?url=${encodeURIComponent(url)}`);
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       showScreen(d);
-    } catch (e) {
-      setStatus('שגיאה: ' + e.message, 'error');
-    } finally {
-      busy = false;
-      document.getElementById('gobtn').disabled = false;
-    }
+    } catch(e) { setStatus('שגיאה: ' + e.message, 'error'); }
+    finally { busy = false; document.getElementById('gobtn').disabled = false; }
   }
 
-  // ── Show screenshot ──────────────────────────────────────────────────────
   function showScreen(data) {
     const img = document.getElementById('screen');
     img.src = 'data:image/jpeg;base64,' + data.screenshot;
     img.onload = () => { imgNaturalW = img.naturalWidth || 1280; };
     img.classList.add('show');
     document.getElementById('empty').style.display = 'none';
-
-    if (data.url) {
-      currentUrl = data.url;
-      document.getElementById('ubar').value = data.url;
-    }
-
-    // Show type bar if there are inputs on the page
+    if (data.url) { currentUrl = data.url; document.getElementById('ubar').value = data.url; }
     const hasInput = data.elements && data.elements.some(e => e.tag === 'input' || e.tag === 'textarea');
     document.getElementById('typebar').classList.toggle('show', !!hasInput);
-
-    setStatus('✓ ' + (data.title || data.url || 'נטען'), 'ok');
+    setStatus('&#10003; ' + (data.title || data.url || 'נטען'), 'ok');
   }
 
-  // ── Click handler ────────────────────────────────────────────────────────
   async function handleClick(e) {
     if (busy) return;
-
     const img = document.getElementById('screen');
     if (!img.classList.contains('show')) return;
-
     const rect = img.getBoundingClientRect();
-    const scaleX = imgNaturalW / rect.width;
-    const scaleY = (img.naturalHeight || 800) / rect.height;
-
-    const x = Math.round((e.clientX - rect.left) * scaleX);
-    const y = Math.round((e.clientY - rect.top) * scaleY);
-
-    // Show click ring
+    const x = Math.round((e.clientX - rect.left) * (imgNaturalW / rect.width));
+    const y = Math.round((e.clientY - rect.top) * ((img.naturalHeight || 800) / rect.height));
     const ring = document.createElement('div');
     ring.className = 'click-ring';
     ring.style.left = (e.clientX - rect.left) + 'px';
-    ring.style.top = (e.clientY - rect.top) + 'px';
+    ring.style.top  = (e.clientY - rect.top)  + 'px';
     document.getElementById('screenWrap').appendChild(ring);
     setTimeout(() => ring.remove(), 500);
-
     busy = true;
     setStatus('לוחץ...', 'loading');
-
     try {
-      const r = await fetch(`${SERVER}/click`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ x, y }),
-      });
+      const r = await fetch(`${SERVER}/click`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({x,y}) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       showScreen(d);
-    } catch (ex) {
-      setStatus('שגיאה: ' + ex.message, 'error');
-    } finally {
-      busy = false;
-    }
+    } catch(ex) { setStatus('שגיאה: ' + ex.message, 'error'); }
+    finally { busy = false; }
   }
 
-  // ── Type text ────────────────────────────────────────────────────────────
   async function sendType() {
     const text = document.getElementById('typeinput').value;
     if (!text || busy) return;
     busy = true;
     setStatus('מקליד...', 'loading');
     try {
-      const r = await fetch(`${SERVER}/type`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      });
+      const r = await fetch(`${SERVER}/type`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text}) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       document.getElementById('typeinput').value = '';
       showScreen(d);
-    } catch (ex) {
-      setStatus('שגיאה: ' + ex.message, 'error');
-    } finally { busy = false; }
+    } catch(ex) { setStatus('שגיאה: ' + ex.message, 'error'); }
+    finally { busy = false; }
   }
 
-  // ── Scroll ───────────────────────────────────────────────────────────────
   async function scrollPage(dir) {
     if (busy) return;
     busy = true;
     setStatus('גולל...', 'loading');
     try {
-      const r = await fetch(`${SERVER}/scroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ direction: dir }),
-      });
+      const r = await fetch(`${SERVER}/scroll`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({direction:dir}) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       showScreen(d);
-    } catch (ex) {
-      setStatus('שגיאה: ' + ex.message, 'error');
-    } finally { busy = false; }
+    } catch(ex) { setStatus('שגיאה: ' + ex.message, 'error'); }
+    finally { busy = false; }
   }
 
-  // ── Status ───────────────────────────────────────────────────────────────
   function setStatus(msg, type) {
     const sb = document.getElementById('sb');
-    document.getElementById('sbtext').textContent = msg;
+    document.getElementById('sbtext').innerHTML = msg;
     document.getElementById('spin').style.display = type === 'loading' ? 'block' : 'none';
     sb.className = 'sb show ' + type;
     if (type !== 'loading') setTimeout(() => sb.classList.remove('show'), 3000);
   }
 
-  // Enter key
   document.getElementById('ubar').addEventListener('keydown', e => { if (e.key === 'Enter') loadUrl(); });
   document.getElementById('typeinput').addEventListener('keydown', e => { if (e.key === 'Enter') sendType(); });
 </script>
